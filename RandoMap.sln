@@ -1,0 +1,25 @@
+
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.32106.194
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{CBBEEBA5-92FE-4579-BF50-DFBC64EF3E85}") = "RandoMap", "RandoMap\RandoMap.csproj", "{DF0D5CCE-92B9-4CD4-A314-A520BAD762EE}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{DF0D5CCE-92B9-4CD4-A314-A520BAD762EE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DF0D5CCE-92B9-4CD4-A314-A520BAD762EE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DF0D5CCE-92B9-4CD4-A314-A520BAD762EE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DF0D5CCE-92B9-4CD4-A314-A520BAD762EE}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {4EBB2D17-2A0F-4249-BD24-BE199B7EEE35}
+	EndGlobalSection
+EndGlobal
