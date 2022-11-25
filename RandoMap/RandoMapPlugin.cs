@@ -7,9 +7,20 @@ namespace RandoMap
     [BepInDependency("haiku.rando", "0.2.0.0")]
     public class RandoMapPlugin : BaseUnityPlugin
     {
+        private static RandoMapPlugin Instance;
+
+        internal static void LogError(string msg)
+        {
+            Instance.Logger.LogError(msg);
+        }
+
+        private Settings settings;
+
         public void Start()
         {
+            Instance = this;
             Logger.LogInfo("Rando Map - Under Construction");
+            settings = new(Config);
         }
     }
 }
