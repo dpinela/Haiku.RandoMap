@@ -24,7 +24,7 @@ namespace RandoMap
             entries = new();
             foreach (var entry in mapping)
             {
-                entries.Add((entry.Key.Name, entry.Value.Name));
+                entries.Add((entry.Value.ItemName(), entry.Key.ItemName()));
             }
         }
 
