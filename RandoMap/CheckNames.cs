@@ -26,5 +26,38 @@ namespace RandoMap
             };
             return LocalizationSystem.GetLocalizedValue(key);
         }
+
+        public static string LocationName(this RTopology.RandoCheck check)
+        {
+            if (check.IsShopItem)
+            {
+                return check.SceneId switch
+                {
+                    220 => "Echo Shop",
+                    28 => "Sonnet Shop (Abandoned Wastes)",
+                    9 => "Sonnet Shop (Train)",
+                    224 => "Reaper Shop",
+                    _ => "??? Shop"
+                };
+            }
+            var baseName = check.ItemName();
+            if (!check.IsUnique())
+            {
+                baseName += $" (Room {check.SceneId})";
+            }
+            return baseName;
+        }
+
+        private const int RustedKey = 0;
+        private const int CapsuleFragment = 3;
+
+        public static bool IsUnique(this RTopology.RandoCheck check) =>
+            check.Type switch
+            {
+                CType.Wrench or CType.Bulblet or CType.Ability or CType.Chip or
+                CType.TrainStation or CType.FireRes or CType.WaterRes => true,
+                CType.Item => !(check.CheckId == RustedKey || check.CheckId == CapsuleFragment),
+                _ => false
+            };
     }
 }

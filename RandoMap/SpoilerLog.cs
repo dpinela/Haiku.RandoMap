@@ -1,5 +1,6 @@
 using IO = System.IO;
 using Collections = System.Collections.Generic;
+using static System.Linq.Enumerable;
 using RChecks = Haiku.Rando.Checks;
 using RTopology = Haiku.Rando.Topology;
 
@@ -21,11 +22,7 @@ namespace RandoMap
 
         public SpoilerLog(Collections.IReadOnlyDictionary<RTopology.RandoCheck, RTopology.RandoCheck> mapping)
         {
-            entries = new();
-            foreach (var entry in mapping)
-            {
-                entries.Add((entry.Value.ItemName(), entry.Key.ItemName()));
-            }
+            entries = mapping.Select(entry => (entry.Value.ItemName(), entry.Key.LocationName())).ToList();
         }
 
         public void WriteToCSV(IO.TextWriter w)
