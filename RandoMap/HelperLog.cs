@@ -76,10 +76,8 @@ namespace RandoMap
 
         public void WriteToCSV(IO.TextWriter w)
         {
-            RandoMapPlugin.LogInfo("obtained checks: " + string.Join(", ", obtainedChecks));
             foreach (var c in ReachableUnvisitedChecks())
             {
-                RandoMapPlugin.LogInfo("helperlogging " + c.ToString());
                 w.WriteLine(c.LocationName());
             }
         }
