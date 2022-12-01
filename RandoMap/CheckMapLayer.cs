@@ -1,4 +1,5 @@
 using UE = UnityEngine;
+using UI = UnityEngine.UI;
 using USM = UnityEngine.SceneManagement;
 using Collections = System.Collections.Generic;
 using static System.Linq.Enumerable;
@@ -64,8 +65,11 @@ namespace RandoMap
                 var roomTransform = room.GetComponent<UE.RectTransform>();
                 var checkMarker = UE.GameObject.Instantiate(markerTemplate);
                 checkMarker.SetActive(true);
-                checkMarker.transform.parent = mapTransform;
+                checkMarker.transform.parent = self.locationRect.parent;
                 var rtransform = checkMarker.GetComponent<UE.RectTransform>();
+                rtransform.parent = self.locationRect.parent;
+                rtransform.anchorMax = self.locationRect.anchorMax;
+                rtransform.anchorMin = self.locationRect.anchorMin;
                 rtransform.anchoredPosition = new UE.Vector2(
                     UE.Mathf.Round(roomTransform.anchoredPosition.x) + UE.Mathf.Round(rc.Position.x),
                     UE.Mathf.Round(roomTransform.anchoredPosition.y) + UE.Mathf.Round(rc.Position.y)
