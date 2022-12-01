@@ -1,3 +1,4 @@
+using RTopology = Haiku.Rando.Topology;
 using UE = UnityEngine;
 using UI = UnityEngine.UI;
 using USM = UnityEngine.SceneManagement;
@@ -11,6 +12,8 @@ namespace RandoMap
         public System.Func<bool> MapEnabled = () => false;
 
         private readonly Collections.List<string> sceneNamesById;
+
+        private readonly Collections.Dictionary<RTopology.RandoCheck, UE.GameObject> markers = new();
 
         public CheckMapLayer()
         {
@@ -53,7 +56,16 @@ namespace RandoMap
                 RandoMapPlugin.LogError("power cell marker not found");
                 return;
             }
-            foreach (var rc in helper.ReachableUnvisitedChecks())
+            var shownChecks = helper.ReachableUnvisitedChecks();
+            // Show checks that are reachable and unvisited, and hide those that are not.
+            foreach (var ent in markers)
+            {
+                if (!shownChecks.Contains(ent.Key))
+                {
+                    ent.Value.SetActive(false);
+                }
+            }
+            foreach (var rc in shownChecks)
             {
                 var roomName = sceneNamesById[rc.SceneId];
                 var room = self.rooms.Where(r => r.name == roomName).FirstOrDefault();
@@ -63,17 +75,24 @@ namespace RandoMap
                     continue;
                 }
                 var roomTransform = room.GetComponent<UE.RectTransform>();
-                var checkMarker = UE.GameObject.Instantiate(markerTemplate);
+                if (!markers.TryGetValue(rc, out var checkMarker))
+                {
+                    checkMarker = UE.GameObject.Instantiate(markerTemplate);
+                    checkMarker.transform.parent = self.locationRect.parent;
+                    var rtransform = checkMarker.GetComponent<UE.RectTransform>();
+                    rtransform.parent = self.locationRect.parent;
+                    rtransform.anchorMax = self.locationRect.anchorMax;
+                    rtransform.anchorMin = self.locationRect.anchorMin;
+                    rtransform.anchoredPosition = new UE.Vector2(
+                        UE.Mathf.Round(roomTransform.anchoredPosition.x) + UE.Mathf.Round(rc.Position.x),
+                        UE.Mathf.Round(roomTransform.anchoredPosition.y) + UE.Mathf.Round(rc.Position.y)
+                    );
+                    markers[rc] = checkMarker;
+                    var destructor = checkMarker.AddComponent<Destructor>();
+                    destructor.enabled = true;
+                    destructor.Func = () => markers.Remove(rc);
+                }
                 checkMarker.SetActive(true);
-                checkMarker.transform.parent = self.locationRect.parent;
-                var rtransform = checkMarker.GetComponent<UE.RectTransform>();
-                rtransform.parent = self.locationRect.parent;
-                rtransform.anchorMax = self.locationRect.anchorMax;
-                rtransform.anchorMin = self.locationRect.anchorMin;
-                rtransform.anchoredPosition = new UE.Vector2(
-                    UE.Mathf.Round(roomTransform.anchoredPosition.x) + UE.Mathf.Round(rc.Position.x),
-                    UE.Mathf.Round(roomTransform.anchoredPosition.y) + UE.Mathf.Round(rc.Position.y)
-                );
             }
         }
 
