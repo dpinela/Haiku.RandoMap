@@ -1,5 +1,6 @@
 using Bep = BepInEx;
 using RChecks = Haiku.Rando.Checks;
+using USM = UnityEngine.SceneManagement;
 
 namespace RandoMap
 {
@@ -27,6 +28,8 @@ namespace RandoMap
             Instance = this;
             Logger.LogInfo("Rando Map - Under Construction");
             settings = new(Config);
+            var layer = new CheckMapLayer() { MapEnabled = () => settings.ShowMap.Value };
+            layer.Hook();
         }
     }
 }
