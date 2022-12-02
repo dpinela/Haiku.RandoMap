@@ -15,6 +15,8 @@ namespace RandoMap
 
         private readonly Collections.Dictionary<RTopology.RandoCheck, UE.GameObject> markers = new();
 
+        private UE.GameObject? markerTemplate;
+
         public CheckMapLayer()
         {
             var numScenes = USM.SceneManager.sceneCountInBuildSettings;
@@ -34,26 +36,58 @@ namespace RandoMap
             }
         }
 
-        private void AddMarkers(On.PlayerLocation.orig_OnEnable orig, PlayerLocation self)
+        private void AddMarkersOnOpenMap(On.PlayerLocation.orig_OnEnable orig, PlayerLocation self)
         {
             orig(self);
+            try
+            {
+                AddMarkers(self);
+            }
+            catch (Exception err)
+            {
+                RandoMapPlugin.LogError(err.ToString());
+            }
+        }
 
+        private UE.GameObject? GetMarkerTemplate(PlayerLocation self)
+        {
+            if (markerTemplate == null)
+            {
+                RandoMapPlugin.LogInfo("CheckMapLayer: getting power cell marker");
+                var powercellMarker = self.mapScreen.gameObject.GetComponentsInChildren<Marker>()
+                    .Where(m => m.powercell).Select(m => m.gameObject).FirstOrDefault();
+                if (powercellMarker == null)
+                {
+                    RandoMapPlugin.LogError("power cell marker not found");
+                    return null;
+                }
+                // This intermediate instantiation is needed so that actual markers instantiated
+                // later appear immediately.
+                markerTemplate = UE.GameObject.Instantiate(powercellMarker);
+                markerTemplate.SetActive(false);
+            }
+            return markerTemplate;
+        }
+
+        private void AddMarkers(PlayerLocation self)
+        {
             if (!MapEnabled())
             {
+                foreach (var m in markers.Values)
+                {
+                    m.SetActive(false);
+                }
                 return;
             }
-
             var helper = HelperLog.Generate();
             if (helper == null)
             {
                 return;
             }
             var mapTransform = self.mapScreen;
-            var markerTemplate = mapTransform.gameObject.GetComponentsInChildren<Marker>()
-                .Where(m => m.powercell).Select(m => m.gameObject).FirstOrDefault();
-            if (markerTemplate == null)
+            var template = GetMarkerTemplate(self);
+            if (template == null)
             {
-                RandoMapPlugin.LogError("power cell marker not found");
                 return;
             }
             var shownChecks = helper.ReachableUnvisitedChecks();
@@ -66,6 +100,9 @@ namespace RandoMap
                 }
             }
             var checkSprite = BundledSprites.Get("Check Marker.png");
+            // self.locationRect isn't set the first time that OnEnable is called;
+            // so we must get that component ourselves.
+            var locationRect = self.GetComponent<UE.RectTransform>();
             foreach (var rc in shownChecks)
             {
                 var roomName = sceneNamesById[rc.SceneId];
@@ -78,14 +115,14 @@ namespace RandoMap
                 var roomTransform = room.GetComponent<UE.RectTransform>();
                 if (!markers.TryGetValue(rc, out var checkMarker))
                 {
-                    checkMarker = UE.GameObject.Instantiate(markerTemplate);
-                    checkMarker.transform.parent = self.locationRect.parent;
+                    checkMarker = UE.GameObject.Instantiate(template);
+                    checkMarker.transform.parent = locationRect.parent;
                     var img = checkMarker.GetComponent<UI.Image>();
                     img.sprite = checkSprite;
                     var rtransform = checkMarker.GetComponent<UE.RectTransform>();
-                    rtransform.parent = self.locationRect.parent;
-                    rtransform.anchorMax = self.locationRect.anchorMax;
-                    rtransform.anchorMin = self.locationRect.anchorMin;
+                    rtransform.parent = locationRect.parent;
+                    rtransform.anchorMax = locationRect.anchorMax;
+                    rtransform.anchorMin = locationRect.anchorMin;
                     rtransform.anchoredPosition = new UE.Vector2(
                         UE.Mathf.Round(roomTransform.anchoredPosition.x) + UE.Mathf.Round(rc.Position.x),
                         UE.Mathf.Round(roomTransform.anchoredPosition.y) + UE.Mathf.Round(rc.Position.y)
@@ -101,7 +138,7 @@ namespace RandoMap
 
         public void Hook()
         {
-            On.PlayerLocation.OnEnable += AddMarkers;
+            On.PlayerLocation.OnEnable += AddMarkersOnOpenMap;
         }
     }
 }
