@@ -26,7 +26,7 @@ namespace RandoMap
                 return;
             }
             var asmloc = typeof(Settings).Assembly.Location;
-            var logloc = IO.Path.Combine(asmloc, "..", "..", "RandoSpoilerLog.csv");
+            var logloc = IO.Path.Combine(asmloc, "..", "..", "..", "RandoSpoilerLog.csv");
             using (var w = IO.File.CreateText(logloc))
             {
                 log.WriteToCSV(w);
@@ -42,7 +42,7 @@ namespace RandoMap
                 return;
             }
             var asmloc = typeof(Settings).Assembly.Location;
-            var logloc = IO.Path.Combine(asmloc, "..", "..", "RandoHelperLog.csv");
+            var logloc = IO.Path.Combine(asmloc, "..", "..", "..", "RandoHelperLog.csv");
             using (var w = IO.File.CreateText(logloc))
             {
                 log.WriteToCSV(w);
