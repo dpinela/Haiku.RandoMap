@@ -1,3 +1,4 @@
+global using System;
 using Bep = BepInEx;
 using RChecks = Haiku.Rando.Checks;
 using USM = UnityEngine.SceneManagement;

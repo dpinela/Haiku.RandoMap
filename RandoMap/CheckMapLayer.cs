@@ -65,6 +65,7 @@ namespace RandoMap
                     ent.Value.SetActive(false);
                 }
             }
+            var checkSprite = BundledSprites.Get("Check Marker.png");
             foreach (var rc in shownChecks)
             {
                 var roomName = sceneNamesById[rc.SceneId];
@@ -79,6 +80,8 @@ namespace RandoMap
                 {
                     checkMarker = UE.GameObject.Instantiate(markerTemplate);
                     checkMarker.transform.parent = self.locationRect.parent;
+                    var img = checkMarker.GetComponent<UI.Image>();
+                    img.sprite = checkSprite;
                     var rtransform = checkMarker.GetComponent<UE.RectTransform>();
                     rtransform.parent = self.locationRect.parent;
                     rtransform.anchorMax = self.locationRect.anchorMax;
