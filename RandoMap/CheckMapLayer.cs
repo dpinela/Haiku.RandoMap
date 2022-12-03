@@ -1,3 +1,5 @@
+using Rando = Haiku.Rando;
+using RChecks = Haiku.Rando.Checks;
 using RTopology = Haiku.Rando.Topology;
 using UE = UnityEngine;
 using UI = UnityEngine.UI;
@@ -64,6 +66,7 @@ namespace RandoMap
                 // This intermediate instantiation is needed so that actual markers instantiated
                 // later appear immediately.
                 markerTemplate = UE.GameObject.Instantiate(powercellMarker);
+                UE.GameObject.Destroy(markerTemplate.GetComponent<Marker>());
                 markerTemplate.SetActive(false);
             }
             return markerTemplate;
@@ -119,6 +122,8 @@ namespace RandoMap
                     checkMarker.transform.parent = locationRect.parent;
                     var img = checkMarker.GetComponent<UI.Image>();
                     img.sprite = checkSprite;
+                    // important in case the template marker was hidden
+                    img.enabled = true;
                     var rtransform = checkMarker.GetComponent<UE.RectTransform>();
                     rtransform.parent = locationRect.parent;
                     rtransform.anchorMax = locationRect.anchorMax;
@@ -136,9 +141,49 @@ namespace RandoMap
             }
         }
 
+        private void HideVanillaMarkerLegends(On.MarkerLegend.orig_ShowLegend orig, MarkerLegend self)
+        {
+            orig(self);
+            try
+            {
+                // If power cells are randomized, the legend for their markers should not appear.
+                if (MapEnabled() && PowercellsAreRandomized())
+                {
+                    self.powercell.SetActive(false);
+                }
+            }
+            catch (Exception err)
+            {
+                RandoMapPlugin.LogError(err.ToString());
+            }
+        }
+
+        private void HidePowercellMarkers(On.Marker.orig_ShowPowercell orig, Marker self)
+        {
+            orig(self);
+            try
+            {
+                // If power cells are randomized, their markers should not appear.
+                if (self.powercell && MapEnabled() && PowercellsAreRandomized())
+                {
+                    self.image.enabled = false;
+                }
+            }
+            catch (Exception err)
+            {
+                RandoMapPlugin.LogError(err.ToString());
+            }
+        }
+
+        private static bool PowercellsAreRandomized() => 
+            RChecks.CheckManager.Instance.Randomizer != null &&
+            Rando.Settings.IncludePowerCells.Value;
+
         public void Hook()
         {
             On.PlayerLocation.OnEnable += AddMarkersOnOpenMap;
+            On.MarkerLegend.ShowLegend += HideVanillaMarkerLegends;
+            On.Marker.ShowPowercell += HidePowercellMarkers;
         }
     }
 }
