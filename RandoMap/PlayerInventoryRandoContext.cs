@@ -12,11 +12,13 @@ namespace RandoMap
     internal class PlayerInventoryRandoContext : RLogic.ICheckRandoContext
     {
         private readonly Collections.Dictionary<string, Collections.List<RTopology.RandoCheck>> checksByStateName;
+        private readonly Collections.ISet<RTopology.RandoCheck> startingChecks;
 
-        public PlayerInventoryRandoContext(Collections.IReadOnlyList<RTopology.RandoCheck> allChecks)
+        public PlayerInventoryRandoContext(Collections.IReadOnlyList<RTopology.RandoCheck> allChecks, Collections.ISet<RTopology.RandoCheck> startingChecks)
         {
             checksByStateName = allChecks.GroupBy(RLogic.LogicEvaluator.GetStateName)
                 .ToDictionary(g => g.Key, g => g.ToList());
+            this.startingChecks = startingChecks;
         }
 
         public bool HasState(string state) => GetCount(state) > 0;
@@ -24,6 +26,6 @@ namespace RandoMap
         public int GetCount(string state) =>
             checksByStateName.Where(e => e.Key.StartsWith(state))
                 .SelectMany(e => e.Value)
-                .Count(RChecks.CheckManager.AlreadyGotCheck);
+                .Count(rc => RChecks.CheckManager.AlreadyGotCheck(rc) || startingChecks.Contains(rc));
     }
 }

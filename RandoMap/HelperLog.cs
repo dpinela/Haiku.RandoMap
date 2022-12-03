@@ -38,10 +38,24 @@ namespace RandoMap
             var initNode = rando.Topology.Scenes[initRoom].Nodes.First(
                 n => n is RTopology.TransitionNode tn &&
                 (tn.Type == TType.RepairStation || tn.Type == TType.HaikuWake));
-            reachableNodes = Flood(initNode, new(rando.Logic)
+            // It may be necessary to run the search multiple times in order to take
+            // into account reachable vanilla checks - for example, vanilla levers
+            // that can be opened with current movement - so that it is possible to
+            // search past edges gated by those checks.
+            var startingItems = new Collections.HashSet<RTopology.RandoCheck>();
+            int formerlyReachableNodes;
+            do
             {
-                Context = new PlayerInventoryRandoContext(rando.Topology.Checks)
-            });
+                formerlyReachableNodes = reachableNodes == null ? 0 : reachableNodes.Count();
+                reachableNodes = Flood(initNode, new(rando.Logic)
+                {
+                    Context = new PlayerInventoryRandoContext(rando.Topology.Checks, startingItems)
+                });
+                var si = reachableNodes.OfType<RTopology.RandoCheck>()
+                    .Where(rc => !rando.CheckMapping.ContainsKey(rc));
+                startingItems = new Collections.HashSet<RTopology.RandoCheck>(si);
+            } while (reachableNodes.Count > formerlyReachableNodes);
+            
             obtainedChecks = new Collections.HashSet<RTopology.RandoCheck>(rando.CheckMapping
                 .Where(m => RChecks.CheckManager.AlreadyGotCheck(m.Value))
                 .Select(m => m.Key));
