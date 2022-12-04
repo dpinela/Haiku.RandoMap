@@ -28,9 +28,17 @@ namespace RandoMap
         {
             Instance = this;
             Logger.LogInfo("Rando Map - Under Construction");
-            settings = new(Config);
-            var layer = new CheckMapLayer() { MapEnabled = () => settings.ShowMap.Value };
-            layer.Hook();
+            try
+            {
+                Text.Hook();
+                settings = new(Config);
+                var layer = new CheckMapLayer() { MapEnabled = () => settings.ShowMap.Value };
+                layer.Hook();
+            }
+            catch (Exception err)
+            {
+                LogError(err.ToString());
+            }
         }
     }
 }

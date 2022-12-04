@@ -19,6 +19,8 @@ namespace RandoMap
 
         private UE.GameObject? markerTemplate;
 
+        private UE.GameObject? markerLegend;
+
         public CheckMapLayer()
         {
             var numScenes = USM.SceneManager.sceneCountInBuildSettings;
@@ -141,21 +143,45 @@ namespace RandoMap
             }
         }
 
-        private void HideVanillaMarkerLegends(On.MarkerLegend.orig_ShowLegend orig, MarkerLegend self)
+        private void ModMarkerLegends(On.MarkerLegend.orig_ShowLegend orig, MarkerLegend self)
         {
             orig(self);
             try
             {
-                // If power cells are randomized, the legend for their markers should not appear.
-                if (MapEnabled() && PowercellsAreRandomized())
+                
+                if (MapEnabled())
                 {
-                    self.powercell.SetActive(false);
+                    // If power cells are randomized, the legend for their markers should not appear.
+                    if (PowercellsAreRandomized())
+                    {
+                        self.powercell.SetActive(false);
+                    }
+                    var ml = GetMarkerLegend(self.powercell);
+                    ml.SetActive(RChecks.CheckManager.Instance.Randomizer != null);
                 }
             }
             catch (Exception err)
             {
                 RandoMapPlugin.LogError(err.ToString());
             }
+        }
+
+        private UE.GameObject GetMarkerLegend(UE.GameObject template)
+        {
+            if (markerLegend != null)
+            {
+                return markerLegend;
+            }
+            markerLegend = UE.GameObject.Instantiate(template);
+            markerLegend.transform.parent = template.transform.parent;
+            var img = markerLegend.GetComponentInChildren<UI.Image>();
+            img.sprite = BundledSprites.Get("Check Marker.png");
+            var txt = markerLegend.GetComponentInChildren<TranslateTextMPro>();
+            txt.GetComponent<TMPro.TMP_Text>().text = Text._RANDO_CHECK;
+            var destructor = markerLegend.AddComponent<Destructor>();
+            destructor.Func = () => markerLegend = null;
+            destructor.enabled = true;
+            return markerLegend;
         }
 
         private void HidePowercellMarkers(On.Marker.orig_ShowPowercell orig, Marker self)
@@ -182,7 +208,7 @@ namespace RandoMap
         public void Hook()
         {
             On.PlayerLocation.OnEnable += AddMarkersOnOpenMap;
-            On.MarkerLegend.ShowLegend += HideVanillaMarkerLegends;
+            On.MarkerLegend.ShowLegend += ModMarkerLegends;
             On.Marker.ShowPowercell += HidePowercellMarkers;
         }
     }
