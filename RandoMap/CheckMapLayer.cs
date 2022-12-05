@@ -148,17 +148,12 @@ namespace RandoMap
             orig(self);
             try
             {
-                
-                if (MapEnabled())
+                // If power cells are randomized, the legend for their markers should not appear.
+                if (MapEnabled() && PowercellsAreRandomized())
                 {
-                    // If power cells are randomized, the legend for their markers should not appear.
-                    if (PowercellsAreRandomized())
-                    {
-                        self.powercell.SetActive(false);
-                    }
-                    var ml = GetMarkerLegend(self.powercell);
-                    ml.SetActive(RChecks.CheckManager.Instance.Randomizer != null);
+                    self.powercell.SetActive(false);
                 }
+                SetMarkerLegend(self.healthStation, MapEnabled() && RChecks.CheckManager.Instance.Randomizer != null);
             }
             catch (Exception err)
             {
@@ -166,23 +161,29 @@ namespace RandoMap
             }
         }
 
-        private UE.GameObject GetMarkerLegend(UE.GameObject template)
+        private void SetMarkerLegend(UE.GameObject template, bool state)
         {
-            if (markerLegend != null)
+            if (!state)
             {
-                return markerLegend;
+                markerLegend?.SetActive(false);
+                return;
             }
-            markerLegend = UE.GameObject.Instantiate(template);
-            markerLegend.transform.parent = template.transform.parent;
-            var img = markerLegend.GetComponentInChildren<UI.Image>();
-            img.sprite = BundledSprites.Get("Check Marker.png");
-            var txt = markerLegend.GetComponentInChildren<TranslateTextMPro>();
-            txt.GetComponent<TMPro.TMP_Text>().text = Text._RANDO_CHECK;
-            var destructor = markerLegend.AddComponent<Destructor>();
-            destructor.Func = () => markerLegend = null;
-            destructor.enabled = true;
-            return markerLegend;
+            if (markerLegend == null)
+            {
+                markerLegend = UE.GameObject.Instantiate(template, template.transform.parent);
+                UI.LayoutRebuilder.ForceRebuildLayoutImmediate(markerLegend.GetComponent<UE.RectTransform>());
+                var img = markerLegend.GetComponentInChildren<UI.Image>();
+                img.sprite = BundledSprites.Get("Check Marker.png", markerLegendPPU);
+                var txt = markerLegend.GetComponentInChildren<TranslateTextMPro>();
+                txt.GetComponent<TMPro.TMP_Text>().text = Text._RANDO_CHECK;
+                var destructor = markerLegend.AddComponent<Destructor>();
+                destructor.Func = () => markerLegend = null;
+                destructor.enabled = true;
+            }
+            markerLegend.SetActive(true);
         }
+
+        private const float markerLegendPPU = 16;
 
         private void HidePowercellMarkers(On.Marker.orig_ShowPowercell orig, Marker self)
         {
