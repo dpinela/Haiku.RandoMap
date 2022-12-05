@@ -57,7 +57,6 @@ namespace RandoMap
         {
             if (markerTemplate == null)
             {
-                RandoMapPlugin.LogInfo("CheckMapLayer: getting power cell marker");
                 var powercellMarker = self.mapScreen.gameObject.GetComponentsInChildren<Marker>()
                     .Where(m => m.powercell).Select(m => m.gameObject).FirstOrDefault();
                 if (powercellMarker == null)
@@ -110,6 +109,11 @@ namespace RandoMap
             var locationRect = self.GetComponent<UE.RectTransform>();
             foreach (var rc in shownChecks)
             {
+                // The train room has no singular location on the map.
+                if (rc.SceneId == Rando.SpecialScenes.Train)
+                {
+                    continue;
+                }
                 var roomName = sceneNamesById[rc.SceneId];
                 var room = self.rooms.Where(r => r.name == roomName).FirstOrDefault();
                 if (room == null)
