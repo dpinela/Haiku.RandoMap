@@ -115,13 +115,13 @@ namespace RandoMap
                     continue;
                 }
                 var roomName = sceneNamesById[rc.SceneId];
-                var room = self.rooms.Where(r => r.name == roomName).FirstOrDefault();
+                var room = self.rooms.Concat(self.staticNPCRooms).Where(r => r.name == roomName).FirstOrDefault();
                 if (room == null)
                 {
-                    RandoMapPlugin.LogError($"CheckMapLayer: room {roomName} not found in map");
+                    RandoMapPlugin.LogError($"CheckMapLayer: room {rc.SceneId} ({roomName}) not found in map");
                     continue;
                 }
-                var roomTransform = room.GetComponent<UE.RectTransform>();
+                var roomPos = room.GetComponent<UE.RectTransform>().anchoredPosition;
                 if (!markers.TryGetValue(rc, out var checkMarker))
                 {
                     checkMarker = UE.GameObject.Instantiate(template);
@@ -135,8 +135,8 @@ namespace RandoMap
                     rtransform.anchorMax = locationRect.anchorMax;
                     rtransform.anchorMin = locationRect.anchorMin;
                     rtransform.anchoredPosition = new UE.Vector2(
-                        UE.Mathf.Round(roomTransform.anchoredPosition.x) + UE.Mathf.Round(rc.Position.x),
-                        UE.Mathf.Round(roomTransform.anchoredPosition.y) + UE.Mathf.Round(rc.Position.y)
+                        UE.Mathf.Round(roomPos.x) + UE.Mathf.Round(rc.Position.x),
+                        UE.Mathf.Round(roomPos.y) + UE.Mathf.Round(rc.Position.y)
                     );
                     markers[rc] = checkMarker;
                     var destructor = checkMarker.AddComponent<Destructor>();
