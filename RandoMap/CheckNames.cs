@@ -23,6 +23,7 @@ namespace RandoMap
                 CType.TrainStation => GameManager.instance.trainStations[check.CheckId].title,
                 CType.FireRes => "_FIRE_RES_TITLE",
                 CType.WaterRes => "_WATER_RES_TITLE",
+                CType.Lore => Rando.Text._LORE_TITLE,
                 _ => "???"
             };
             var baseName = LocalizationSystem.GetLocalizedValue(key);
@@ -129,7 +130,24 @@ namespace RandoMap
             {25, "Abandoned Wastes-Past Tire Mother"},
             {88, "Pinion's Expanse-Clock"},
             {21, "Abandoned Wastes-Gauntlet Past Magnet"},
-            {198, "Ruined Surface-Factory Chimneys"}
+            {198, "Ruined Surface-Factory Chimneys"},
+            {83, "Central Core-Bulb Hive"},
+            {103, "Incinerator Burner-Bunsen Burner"},
+            {105, "Incinerator Burner-Flame Lore"},
+            {117, "Water Ducts-Elevator"},
+            {127, "Water Ducts-Lower Repair Station"},
+            {139, "Forgotten Ruins-Entrance to Lost Archives"},
+            {140, "Forgotten Ruins-Repair Station by Blink Gauntlet"},
+            {152, "Sunken Wastes-Amplifying Transputer"},
+            {191, "Factory Facility-Money Shrine Bot"},
+            {206, "Water Ducts-Helm-Crawlers Refuge"},
+            {230, "Factory Facility-Big Brother Entrance"},
+            {58, "Last Bunker-Bunk Beds"},
+            {59, "Last Bunker-Basketball Court"},
+            {30, "Last Bunker-Candles"},
+            {32, "Last Bunker-Hand Print Monument"},
+            {144, "Lost Archives"},
+            {164, "Forgotten Ruins-Research Lab"}
         };
 
         private static string RoomName(int sceneId) =>
