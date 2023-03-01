@@ -24,9 +24,10 @@ namespace RandoMap
                 CType.FireRes => "_FIRE_RES_TITLE",
                 CType.WaterRes => "_WATER_RES_TITLE",
                 CType.Lore => Rando.Text._LORE_TITLE,
-                _ => "???"
+                CType.Filler => Rando.Text._NOTHING_TITLE,
+                _ => ""
             };
-            var baseName = LocalizationSystem.GetLocalizedValue(key);
+            var baseName = string.IsNullOrEmpty(key) ? "???" : LocalizationSystem.GetLocalizedValue(key);
             return check.Type switch
             {
                 CType.Item when check.CheckId == 7 => $"Green {baseName}",
