@@ -34,10 +34,11 @@ namespace RandoMap
 
         public HelperLog(RLogic.CheckRandomizer rando)
         {
-            var initRoom = rando.StartScene ?? Rando.SpecialScenes.GameStart;
-            var initNode = rando.Topology.Scenes[initRoom].Nodes.First(
-                n => n is RTopology.TransitionNode tn &&
-                (tn.Type == TType.RepairStation || tn.Type == TType.HaikuWake));
+            var initNode = rando.StartScene is int sceneId ?
+                rando.Topology.Scenes[sceneId].Nodes.First(
+                    n => n is RTopology.TransitionNode tn && tn.Type == TType.RepairStation) :
+                rando.Topology.Scenes[Rando.SpecialScenes.GameStart].Nodes.First(
+                    n => n is RTopology.TransitionNode tn && tn.Type == TType.HaikuWake);
             // It may be necessary to run the search multiple times in order to take
             // into account reachable vanilla checks - for example, vanilla levers
             // that can be opened with current movement - so that it is possible to
