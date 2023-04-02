@@ -206,9 +206,11 @@ namespace RandoMap
             }
         }
 
-        private static bool PowercellsAreRandomized() => 
-            RChecks.CheckManager.Instance.Randomizer != null &&
-            Rando.Settings.IncludePowerCells.Value;
+        private static bool PowercellsAreRandomized()
+        {
+            var r = RChecks.CheckManager.Instance.Randomizer;
+            return r != null && r.Settings.Contains(Rando.Pool.PowerCells);
+        }
 
         public void Hook()
         {

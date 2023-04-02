@@ -1,4 +1,5 @@
 using Rando = Haiku.Rando;
+using RChecks = Haiku.Rando.Checks;
 using RTopology = Haiku.Rando.Topology;
 using CType = Haiku.Rando.Topology.CheckType;
 using Collections = System.Collections.Generic;
@@ -9,24 +10,7 @@ namespace RandoMap
     {
         public static string ItemName(this RTopology.RandoCheck check)
         {
-            var key = check.Type switch
-            {
-                CType.Wrench => "_HEALING_WRENCH_TITLE",
-                CType.Bulblet => "_LIGHT_BULB_TITLE",
-                CType.Ability => Rando.HaikuResources.RefUnlockTutorial.abilities[check.CheckId].title,
-                CType.Item => InventoryManager.instance.items[check.CheckId].itemName,
-                CType.Chip => GameManager.instance.chip[check.CheckId].title,
-                CType.ChipSlot => "_CHIP_SLOT",
-                CType.MapDisruptor => "_DISRUPTOR",
-                CType.PowerCell => "_POWERCELL",
-                CType.Coolant => "_COOLANT_TITLE",
-                CType.TrainStation => GameManager.instance.trainStations[check.CheckId].title,
-                CType.FireRes => "_FIRE_RES_TITLE",
-                CType.WaterRes => "_WATER_RES_TITLE",
-                CType.Lore => Rando.Text._LORE_TITLE,
-                CType.Filler => Rando.Text._NOTHING_TITLE,
-                _ => ""
-            };
+            var key = RChecks.UIDef.Of(check).Name;
             var baseName = string.IsNullOrEmpty(key) ? "???" : LocalizationSystem.GetLocalizedValue(key);
             return check.Type switch
             {
@@ -72,7 +56,8 @@ namespace RandoMap
             check.Type switch
             {
                 CType.Wrench or CType.Bulblet or CType.Ability or CType.Chip or
-                CType.TrainStation or CType.FireRes or CType.WaterRes or CType.MapDisruptor => true,
+                CType.TrainStation or CType.FireRes or CType.WaterRes or
+                CType.MapDisruptor or CType.MapMarker => true,
                 CType.Item => !(check.CheckId == RustedKey || check.CheckId == CapsuleFragment),
                 _ => false
             };
@@ -148,7 +133,8 @@ namespace RandoMap
             {30, "Last Bunker-Candles"},
             {32, "Last Bunker-Hand Print Monument"},
             {144, "Lost Archives"},
-            {164, "Forgotten Ruins-Research Lab"}
+            {164, "Forgotten Ruins-Research Lab"},
+            {221, "Factory Facility-Slate"}
         };
 
         private static string RoomName(int sceneId) =>
