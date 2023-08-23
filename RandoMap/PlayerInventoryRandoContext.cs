@@ -1,5 +1,4 @@
 using RLogic = Haiku.Rando.Logic;
-using SNames = Haiku.Rando.Logic.LogicStateNames;
 using RChecks = Haiku.Rando.Checks;
 using RTopology = Haiku.Rando.Topology;
 using Collections = System.Collections.Generic;
@@ -11,21 +10,33 @@ namespace RandoMap
     // the player, as determined by rando itself.
     internal class PlayerInventoryRandoContext : RLogic.ICheckRandoContext
     {
-        private readonly Collections.Dictionary<string, Collections.List<RTopology.RandoCheck>> checksByStateName;
-        private readonly Collections.ISet<RTopology.RandoCheck> startingChecks;
+        private const int NumSymbols = (int)RLogic.LogicSymbol.False;
 
-        public PlayerInventoryRandoContext(Collections.IReadOnlyList<RTopology.RandoCheck> allChecks, Collections.ISet<RTopology.RandoCheck> startingChecks)
+        private readonly Collections.List<RTopology.RandoCheck>[] checksBySymbol;
+        private readonly ushort[] startingSymbols;
+
+        public PlayerInventoryRandoContext(Collections.IReadOnlyList<RTopology.RandoCheck> allChecks, Collections.IEnumerable<RTopology.RandoCheck> startingChecks)
         {
-            checksByStateName = allChecks.GroupBy(RLogic.LogicEvaluator.GetStateName)
-                .ToDictionary(g => g.Key, g => g.ToList());
-            this.startingChecks = startingChecks;
+            checksBySymbol = new Collections.List<RTopology.RandoCheck>[NumSymbols];
+            startingSymbols = new ushort[NumSymbols];
+            for (var i = 0; i < NumSymbols; i++)
+            {
+                checksBySymbol[i] = new();
+            }
+            foreach (var check in allChecks)
+            {
+                var sym = RLogic.LogicEvaluator.SymbolForCheck(check);
+                checksBySymbol[(int)sym].Add(check);
+            }
+            foreach (var check in startingChecks)
+            {
+                var sym = RLogic.LogicEvaluator.SymbolForCheck(check);
+                startingSymbols[(int)sym]++;
+            }
         }
 
-        public bool HasState(string state) => GetCount(state) > 0;
-
-        public int GetCount(string state) =>
-            checksByStateName.Where(e => e.Key.StartsWith(state))
-                .SelectMany(e => e.Value)
-                .Count(rc => RChecks.CheckManager.AlreadyGotCheck(rc) || startingChecks.Contains(rc));
+        public int GetCount(RLogic.LogicSymbol state) =>
+            checksBySymbol[(int)state].Count(RChecks.CheckManager.AlreadyGotCheck) +
+            startingSymbols[(int)state];
     }
 }

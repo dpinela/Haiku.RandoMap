@@ -43,7 +43,7 @@ namespace RandoMap
             // into account reachable vanilla checks - for example, vanilla levers
             // that can be opened with current movement - so that it is possible to
             // search past edges gated by those checks.
-            var startingItems = new Collections.HashSet<RTopology.RandoCheck>();
+            Collections.IEnumerable<RTopology.RandoCheck> startingItems = new RTopology.RandoCheck[0];
             int formerlyReachableNodes;
             do
             {
@@ -52,9 +52,8 @@ namespace RandoMap
                 {
                     Context = new PlayerInventoryRandoContext(rando.Topology.Checks, startingItems)
                 });
-                var si = reachableNodes.OfType<RTopology.RandoCheck>()
+                startingItems = reachableNodes.OfType<RTopology.RandoCheck>()
                     .Where(rc => !rando.CheckMapping.ContainsKey(rc));
-                startingItems = new Collections.HashSet<RTopology.RandoCheck>(si);
             } while (reachableNodes.Count > formerlyReachableNodes);
             
             obtainedChecks = new Collections.HashSet<RTopology.RandoCheck>(rando.CheckMapping
