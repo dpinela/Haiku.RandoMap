@@ -57,7 +57,7 @@ namespace RandoMap
             {
                 CType.Wrench or CType.Bulblet or CType.Ability or CType.Chip or
                 CType.TrainStation or CType.FireRes or CType.WaterRes or
-                CType.MapDisruptor or CType.MapMarker => true,
+                CType.MapDisruptor or CType.MapMarker or CType.Lever => true,
                 CType.Item => !(check.CheckId == RustedKey || check.CheckId == CapsuleFragment),
                 _ => false
             };
