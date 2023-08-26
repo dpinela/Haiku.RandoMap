@@ -15,10 +15,10 @@ namespace RandoMap
         private readonly Collections.List<RTopology.RandoCheck>[] checksBySymbol;
         private readonly ushort[] startingSymbols;
 
-        public PlayerInventoryRandoContext(Collections.IReadOnlyList<RTopology.RandoCheck> allChecks, Collections.IEnumerable<RTopology.RandoCheck> startingChecks)
+        public PlayerInventoryRandoContext(Collections.IReadOnlyList<RTopology.RandoCheck> allChecks, ushort[] startingSymbols)
         {
             checksBySymbol = new Collections.List<RTopology.RandoCheck>[NumSymbols];
-            startingSymbols = new ushort[NumSymbols];
+            this.startingSymbols = startingSymbols;
             for (var i = 0; i < NumSymbols; i++)
             {
                 checksBySymbol[i] = new();
@@ -27,11 +27,6 @@ namespace RandoMap
             {
                 var sym = RLogic.LogicEvaluator.SymbolForCheck(check);
                 checksBySymbol[(int)sym].Add(check);
-            }
-            foreach (var check in startingChecks)
-            {
-                var sym = RLogic.LogicEvaluator.SymbolForCheck(check);
-                startingSymbols[(int)sym]++;
             }
         }
 

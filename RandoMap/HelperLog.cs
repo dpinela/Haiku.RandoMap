@@ -43,17 +43,45 @@ namespace RandoMap
             // into account reachable vanilla checks - for example, vanilla levers
             // that can be opened with current movement - so that it is possible to
             // search past edges gated by those checks.
-            Collections.IEnumerable<RTopology.RandoCheck> startingItems = new RTopology.RandoCheck[0];
+            var startingSymbols = new ushort[(int)RLogic.LogicSymbol.False];
             int formerlyReachableNodes;
             do
             {
                 formerlyReachableNodes = reachableNodes == null ? 0 : reachableNodes.Count();
                 reachableNodes = Flood(initNode, new(rando.Logic)
                 {
-                    Context = new PlayerInventoryRandoContext(rando.Topology.Checks, startingItems)
+                    Context = new PlayerInventoryRandoContext(rando.Topology.Checks, startingSymbols)
                 });
-                startingItems = reachableNodes.OfType<RTopology.RandoCheck>()
-                    .Where(rc => !rando.CheckMapping.ContainsKey(rc));
+
+                // Look for vanilla checks and bosses that are reachable.
+                var bossTransitions = RLogic.CheckRandomizer.BossTransitions();
+                Array.Clear(startingSymbols, 0, startingSymbols.Length);
+                foreach (var rn in reachableNodes)
+                {
+                    if (rn is RTopology.RandoCheck rc)
+                    {
+                        if (!rando.CheckMapping.ContainsKey(rc))
+                        {
+                            var sym = RLogic.LogicEvaluator.SymbolForCheck(rc);
+                            startingSymbols[(int)sym]++;
+                        }
+                    }
+                    else if (rn is RTopology.TransitionNode tn)
+                    {
+                        var k1 = (tn.SceneId1, tn.Alias1);
+                        if (bossTransitions.TryGetValue(k1, out var sym1))
+                        {
+                            startingSymbols[(int)sym1]++;
+                            bossTransitions.Remove(k1);
+                        }
+                        var k2 = (tn.SceneId2, tn.Alias2);
+                        if (bossTransitions.TryGetValue(k2, out var sym2))
+                        {
+                            startingSymbols[(int)sym2]++;
+                            bossTransitions.Remove(k2);
+                        }
+                    }
+                }
             } while (reachableNodes.Count > formerlyReachableNodes);
             
             obtainedChecks = new Collections.HashSet<RTopology.RandoCheck>(rando.CheckMapping
