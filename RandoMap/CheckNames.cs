@@ -138,6 +138,6 @@ namespace RandoMap
         };
 
         private static string RoomName(int sceneId) =>
-            roomNames.TryGetValue(sceneId, out var name) ? name : "???";
+            roomNames.TryGetValue(sceneId, out var name) ? name : $"Scene {sceneId}";
     }
 }
