@@ -1,3 +1,8 @@
+# 1.1.1 (24 September 2023)
+
+Fixes a bug that caused the map and helper log to not function with
+Randomizer 2.2.3 or later.
+
 # 1.1 (30 August 2023)
 
 Due to changes in the Randomizer's implementation (supporting the performance improvements
