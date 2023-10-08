@@ -85,7 +85,7 @@ namespace RandoMap
             } while (reachableNodes.Count > formerlyReachableNodes);
             
             obtainedChecks = new Collections.HashSet<RTopology.RandoCheck>(rando.CheckMapping
-                .Where(m => RChecks.CheckManager.AlreadyGotCheck(m.Value))
+                .Where(m => m.Value.Obtained())
                 .Select(m => m.Key));
             obtainedChecks.UnionWith(rando.Topology.Checks
                 .Where(rc => !rando.CheckMapping.ContainsKey(rc)));

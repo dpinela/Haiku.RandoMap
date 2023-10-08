@@ -20,17 +20,13 @@ namespace RandoMap
             return new(rando.CheckMapping);
         }
 
-        public SpoilerLog(Collections.IReadOnlyDictionary<RTopology.RandoCheck, RTopology.RandoCheck> mapping)
+        public SpoilerLog(Collections.IReadOnlyDictionary<RTopology.RandoCheck, RTopology.IRandoItem> mapping)
         {
             entries = mapping
-                .Where(entry => !IsDeletedCheck(entry.Value))
+                .Where(entry => entry.Value is not RChecks.BlankItem)
                 .Select(entry => (entry.Value.ItemName(), entry.Key.LocationName()))
                 .ToList();
         }
-
-        // Rando uses 999999 for consolidated scrap piles, but we can be a little more permissive.
-        private static bool IsDeletedCheck(RTopology.RandoCheck rc) =>
-            rc.Type == RTopology.CheckType.Filler && rc.CheckId > 900000;
 
         public void WriteToCSV(IO.TextWriter w)
         {

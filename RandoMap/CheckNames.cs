@@ -8,16 +8,20 @@ namespace RandoMap
 {
     internal static class CheckNames
     {
-        public static string ItemName(this RTopology.RandoCheck check)
+        public static string ItemName(this RTopology.IRandoItem check)
         {
-            var key = RChecks.UIDef.Of(check).Name;
+            var key = check.UIDef().Name;
             var baseName = string.IsNullOrEmpty(key) ? "???" : LocalizationSystem.GetLocalizedValue(key);
-            return check.Type switch
+            if (check is not RTopology.RandoCheck rc)
             {
-                CType.Item when check.CheckId == 7 => $"Green {baseName}",
-                CType.Item when check.CheckId == 8 => $"Red {baseName}",
-                CType.ChipSlot => $"{ChipSlotColor(check.CheckId)} {baseName}",
-                CType.MapDisruptor => $"{baseName} ({RoomName(check.SceneId)})",
+                return baseName;
+            }
+            return rc.Type switch
+            {
+                CType.Item when rc.CheckId == 7 => $"Green {baseName}",
+                CType.Item when rc.CheckId == 8 => $"Red {baseName}",
+                CType.ChipSlot => $"{ChipSlotColor(rc.CheckId)} {baseName}",
+                CType.MapDisruptor => $"{baseName} ({RoomName(rc.SceneId)})",
                 _ => baseName
             };
         }
