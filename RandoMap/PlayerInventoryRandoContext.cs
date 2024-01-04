@@ -10,16 +10,14 @@ namespace RandoMap
     // the player, as determined by rando itself.
     internal class PlayerInventoryRandoContext : RLogic.ICheckRandoContext
     {
-        private const int NumSymbols = (int)RLogic.LogicSymbol.False;
-
         private readonly Collections.List<RTopology.RandoCheck>[] checksBySymbol;
         private readonly ushort[] startingSymbols;
 
         public PlayerInventoryRandoContext(Collections.IReadOnlyList<RTopology.RandoCheck> allChecks, ushort[] startingSymbols)
         {
-            checksBySymbol = new Collections.List<RTopology.RandoCheck>[NumSymbols];
+            checksBySymbol = new Collections.List<RTopology.RandoCheck>[Haiku.Rando.RandoPlugin.NumLogicSymbols];
             this.startingSymbols = startingSymbols;
-            for (var i = 0; i < NumSymbols; i++)
+            for (var i = 0; i < Haiku.Rando.RandoPlugin.NumLogicSymbols; i++)
             {
                 checksBySymbol[i] = new();
             }

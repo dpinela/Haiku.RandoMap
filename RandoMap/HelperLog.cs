@@ -43,7 +43,7 @@ namespace RandoMap
             // into account reachable vanilla checks - for example, vanilla levers
             // that can be opened with current movement - so that it is possible to
             // search past edges gated by those checks.
-            var startingSymbols = new ushort[(int)RLogic.LogicSymbol.False];
+            var startingSymbols = new ushort[Rando.RandoPlugin.NumLogicSymbols];
             int formerlyReachableNodes;
             do
             {
