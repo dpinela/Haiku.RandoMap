@@ -1,3 +1,7 @@
+# 1.1.2 (4 January 2024)
+
+Actually fixes what 1.1.1 was supposed to fix.
+
 # 1.1.1 (24 September 2023)
 
 Fixes a bug that caused the map and helper log to not function with
